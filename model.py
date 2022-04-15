@@ -1,19 +1,18 @@
+import random, operator, pandas as pd, numpy as np
 from haversine import haversine
 
-
 class City:
-    def __init__(self, x, y):
+    def __init__(self, name, x, y):
+        self.name = name
         self.x = x
         self.y = y
     
     def distance(self, city):
-        xDis = abs(self.x - city.x)
-        yDis = abs(self.y - city.y)
-        distance = np.sqrt((xDis ** 2) + (yDis ** 2))
+        distance = haversine((self.x, self.y), (city.x, city.y))
         return distance
     
     def __repr__(self):
-        return "(" + str(self.x) + "," + str(self.y) + ")"
+        return "(" + str(self.name) + "," + str(self.x) + "," + str(self.y) + ")"
 
 class Fitness:
     def __init__(self, route):
@@ -139,3 +138,13 @@ def nextGeneration(currentGen, eliteSize, mutationRate):
     children = breedPopulation(matingpool, eliteSize)
     nextGeneration = mutatePopulation(children, mutationRate)
     return nextGeneration
+
+def geneticAlgorithm(population, popSize, eliteSize, mutationRate, generations):
+    pop = initialPopulation(popSize, population)
+    
+    for i in range(0, generations):
+        pop = nextGeneration(pop, eliteSize, mutationRate)
+    
+    bestRouteIndex = rankRoutes(pop)[0][0]
+    bestRoute = pop[bestRouteIndex]
+    return bestRoute
